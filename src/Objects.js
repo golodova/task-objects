@@ -8,6 +8,16 @@
   Объект после манипуляций следует вернуть в качестве результата работы функции.
 */
 export function personUpdate(data) {
+  if (data.gender === 'female') {
+    if ('age' in data) {
+      delete data.age;
+    }
+  } else if (data.gender === 'male') {
+    if (!('income' in data)) {
+      data.income = 100000;
+    }
+  }
+  return data;
 }
 
 /*
@@ -15,6 +25,13 @@ export function personUpdate(data) {
   Верните список названий этих полей в алфавитном порядке в виде массива строк.
 */
 export function objectFieldsList(obj1, obj2, obj3) {
+  const fields = new Set();
+  
+  [obj1, obj2, obj3].forEach(obj => {
+    Object.keys(obj).forEach(key => fields.add(key));
+  });
+  
+  return Array.from(fields).sort();
 }
 
 /*
@@ -23,4 +40,43 @@ export function objectFieldsList(obj1, obj2, obj3) {
   Количество клонов - count.
 */
 export function objectClone(obj, count) {
+
+  if (typeof count !== 'number' || count <= 0) {
+    return [];
+  }
+
+  const clones = [];
+  
+  for (let i = 0; i < count; i++) {
+    // Создаём базовый клон с добавлением id
+    const clone = {
+      ...deepClone(obj),
+      id: i + 1  // Порядковый номер начинается с 1
+    };
+    clones.push(clone);
+  }
+  
+  return clones;
 }
+
+// Вспомогательная функция для глубокого клонирования
+function deepClone(source) {
+  if (source === null || typeof source !== 'object') {
+    return source;
+  }
+
+  if (Array.isArray(source)) {
+    return source.map(item => deepClone(item));
+  }
+
+  const clone = {};
+  for (const key in source) {
+    if (source.hasOwnProperty(key)) {
+      clone[key] = deepClone(source[key]);
+    }
+  }
+  
+  return clone;
+}
+
+
